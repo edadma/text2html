@@ -1,4 +1,4 @@
-package io.github.edadma.cross_template
+package io.github.edadma.text2html
 
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
