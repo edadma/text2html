@@ -33,7 +33,7 @@ import scala.annotation.tailrec
 
       val chapter = f.getFileName.toString.dropRight(3).toInt.toString
       val in = Files.readString(f)
-      val outfile = outdir resolve s"$chapter.html"
+      val outfile = outdir resolve chapter
       val out = new PrintWriter(outfile.toString)
 
       println(s"Writing to file $outfile")
@@ -41,7 +41,7 @@ import scala.annotation.tailrec
         """<div class="prose prose-h1:text-gray-400 prose-h1:font-fondamento prose-h1:font-normal prose-h2:text-gray-400 prose-h3:text-gray-400 prose-p:text-gray-400 prose-p:m-0">""",
       )
       out.println(transform(in))
-      out.println("</div>")
+      out.print("</div>")
       out.close()
     }
   }
