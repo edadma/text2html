@@ -7,9 +7,14 @@ import scala.annotation.tailrec
 
 @main def run(): Unit =
   val input = """
-    |testing
+    |# testing
     |
     |asdf
+    |
+    |##next heading
+    |
+    |zxcv
+    |dfhg
     |""".stripMargin
 
   pprintln(input)
@@ -23,6 +28,16 @@ def transform(md: String): String =
     else skipUntilAfter(r.next, c)
 
   @tailrec
+  def skipSpace(r: CharReader): CharReader =
+    if r.ch == ' ' then skipSpace(r.next)
+    else r
+
+  @tailrec
+  def skipRepeating(r: CharReader, c: Char, count: Int = 0): (Int, CharReader) =
+    if r.ch == c then skipRepeating(r.next, c, count + 1)
+    else (count, r)
+
+  @tailrec
   def consumeLine(r: CharReader, buf: StringBuilder = new StringBuilder): (String, CharReader) =
     if r.eoi then (buf.toString, r)
     else if r.ch == '\n' then (buf.toString, r.next)
@@ -33,11 +48,14 @@ def transform(md: String): String =
   val buf = new StringBuilder
   val par = new StringBuilder
 
+  def tag(name: String, body: String): Unit =
+    if buf.nonEmpty then buf += '\n'
+
+    buf ++= s"<$name>$body</$name>"
+
   def paragraph(): Unit =
     if par.nonEmpty then
-      if buf.nonEmpty then buf += '\n'
-
-      buf ++= s"<p>${par.toString}</p>"
+      tag("p", par.toString)
       par.clear()
 
   @tailrec
@@ -48,7 +66,14 @@ def transform(md: String): String =
     else if r.ch == '\n' then
       paragraph()
       transform(r.next)
-//    else if r.ch == '#'
+    else if r.ch == '#' then
+      val (count, r1) = skipRepeating(r, '#')
+      val r2 = skipSpace(r1)
+      val (heading, r3) = consumeLine(r2)
+
+      paragraph()
+      tag(s"h$count", heading)
+      transform(r3)
     else
       val (line, r1) = consumeLine(r)
 
