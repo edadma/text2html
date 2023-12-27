@@ -31,6 +31,7 @@ def transform(md: String): String =
 
   val buf = new StringBuilder
   val par = new StringBuilder
+  var firstParagraph = true
 
   def tag(name: String, body: String, cls: String | Null = null): Unit =
     if buf.nonEmpty then buf += '\n'
@@ -44,8 +45,9 @@ def transform(md: String): String =
 
   def paragraph(): Unit =
     if par.nonEmpty then
-      tag("p", par.toString, "indent-8 m-0")
+      tag("p", par.toString, if firstParagraph then "m-0" else "indent-8 m-0")
       par.clear()
+      firstParagraph = false
 
   @tailrec
   def transform(r: CharReader): String =
@@ -61,6 +63,7 @@ def transform(md: String): String =
       val (heading, r3) = consumeLine(r2)
 
       paragraph()
+      firstParagraph = true
       tag(s"h$count", heading)
       transform(r3)
     else
@@ -69,10 +72,12 @@ def transform(md: String): String =
 
       if next.nonEmpty && next.forall(_ == '=') then
         paragraph()
+        firstParagraph = true
         tag("h1", line)
         transform(r2)
       else if next.nonEmpty && next.forall(_ == '-') then
         paragraph()
+        firstParagraph = true
         tag("h2", line)
         transform(r2)
       else if line.head.isDigit then

@@ -42,7 +42,7 @@ import scala.annotation.tailrec
       val out = new PrintWriter(outfile.toString)
 
       println(s"Writing to file $outfile")
-      out.println("<div>")
+      out.println("""<div class="prose">""")
       out.println(transform(in))
       out.println("</div>")
       out.close()
