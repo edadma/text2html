@@ -45,7 +45,7 @@ def transform(md: String): String =
 
   def paragraph(): Unit =
     if par.nonEmpty then
-      tag("p", par.toString, if firstParagraph then "m-0" else "indent-8 m-0")
+      tag("p", par.toString, if firstParagraph then "" else "indent-8")
       par.clear()
       firstParagraph = false
 
