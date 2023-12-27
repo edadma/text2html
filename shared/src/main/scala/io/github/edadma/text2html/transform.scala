@@ -75,6 +75,11 @@ def transform(md: String): String =
         paragraph()
         tag("h2", line)
         transform(r2)
+      else if line.head.isDigit then
+        val (verse, rest) = line.span(_.isDigit)
+
+        add(s"<sup>$verse</sup>${rest.trim}")
+        transform(r1)
       else
         add(line)
         transform(r1)
