@@ -1,5 +1,6 @@
 package io.github.edadma.text2html
 
+import io.github.edadma.char_reader.CharReader
 import java.nio.file.{Files, Paths}
 import pprint.*
 
@@ -11,8 +12,7 @@ import java.io.PrintWriter
 
   println(s"Root directory $root")
 
-  if (!Files.isReadable(root))
-    problem(s"Directory $root is unreadable")
+  if (!Files.isReadable(root)) problem(s"Directory $root is unreadable")
 
   if (!Files.exists(output))
     println(s"Creating directory $output")
@@ -29,15 +29,18 @@ import java.io.PrintWriter
     list(d).filter(_.getFileName.toString.endsWith(".md")) foreach { f =>
       println(s"Reading markdown file $f")
 
-      if (!Files.isReadable(f))
-        problem(s"File $f is unreadable")
+      if (!Files.isReadable(f)) problem(s"File $f is unreadable")
 
       val chapter = f.getFileName.toString.dropRight(3)
       val in = Files.readString(f)
-      val outfile = output.resolve(s"$book-$chapter.html").toString
-      val out = new PrintWriter(outfile)
+      val outfile = output.resolve(s"$book-$chapter.html")
+
+      if (!Files.isWritable(outfile)) problem(s"File $outfile is unwritable")
+
+      val out = new PrintWriter(outfile.toString)
 
       println(s"Writing to file $outfile")
+//      out.println(transform(in))
 
       out.close()
     }

@@ -29,6 +29,7 @@ lazy val text2html = crossProject(JSPlatform, JVMPlatform, NativePlatform)
     libraryDependencies ++= Seq(
       "com.github.scopt" %%% "scopt" % "4.1.0",
       "com.lihaoyi" %%% "pprint" % "0.8.1", /*% "test"*/
+      "io.github.edadma" %%% "char-reader" % "0.1.11",
     ),
     publishMavenStyle := true,
     Test / publishArtifact := false,
