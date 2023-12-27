@@ -10,7 +10,7 @@ import scala.annotation.tailrec
 
 @main def run(): Unit =
   val root = Paths.get("test/input").toAbsolutePath
-  val output = Paths.get("test/output").toAbsolutePath
+  val output = Paths.get("test/text").toAbsolutePath
 
   println(s"Root directory $root")
 
