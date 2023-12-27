@@ -32,10 +32,10 @@ def transform(md: String): String =
   val buf = new StringBuilder
   val par = new StringBuilder
 
-  def tag(name: String, body: String): Unit =
+  def tag(name: String, body: String, cls: String | Null = null): Unit =
     if buf.nonEmpty then buf += '\n'
 
-    buf ++= s"<$name>$body</$name>"
+    buf ++= s"<$name${if cls eq null then "" else s""" class="$cls""""}>$body</$name>"
 
   def add(text: String): Unit =
     if par.nonEmpty then par += '\n'
@@ -44,7 +44,7 @@ def transform(md: String): String =
 
   def paragraph(): Unit =
     if par.nonEmpty then
-      tag("p", par.toString)
+      tag("p", par.toString, "indent-8 m-0")
       par.clear()
 
   @tailrec
