@@ -5,25 +5,28 @@ import java.nio.file.{Files, Paths}
 import java.io.PrintWriter
 
 def App(config: Config): Unit =
-  val root = Paths get "test/input" toAbsolutePath
-  val output = Paths get "test/text" toAbsolutePath
+  val root = Paths get config.root toAbsolutePath
+  val output = Paths get config.output.get toAbsolutePath
 
-  println(s"Root directory $root")
+  def message(m: String): Unit = if config.verbose then println(m)
 
-  if (!Files.isReadable(root)) problem(s"Directory $root is unreadable")
+  message(s"Root directory $root")
+
+  if !Files.exists(root) then problem(s"Directory $root doesn't exist")
+  if !Files.isReadable(root) then problem(s"Directory $root is unreadable")
 
   list(root).filter(p => isDir(p) && !p.getFileName.toString.startsWith(".")) foreach { d =>
-    println(s"Processing directory $d")
+    message(s"Processing directory $d")
 
     val book = d.getFileName.toString
     val bookName = book split '_' map (_.capitalize) mkString " "
     val outdir = output resolve book
 
-    println(s"Creating directory $outdir for book '$bookName'")
+    message(s"Creating directory $outdir for book '$bookName'")
     Files.createDirectories(outdir)
 
     list(d).filter(_.getFileName.toString.endsWith(".md")) foreach { f =>
-      println(s"Reading markdown file $f")
+      message(s"Reading markdown file $f")
 
       if (!Files.isReadable(f)) problem(s"File $f is unreadable")
 
@@ -32,7 +35,7 @@ def App(config: Config): Unit =
       val outfile = outdir resolve chapter
       val out = new PrintWriter(outfile.toString)
 
-      println(s"Writing to file $outfile")
+      message(s"Writing to file $outfile")
       out.println(
         """<div class="prose prose-h1:text-gray-400 prose-h1:font-fondamento prose-h1:font-normal prose-h2:text-gray-400 prose-h3:text-gray-400 prose-p:text-gray-400 prose-p:m-0">""",
       )

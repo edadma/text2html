@@ -43,7 +43,7 @@ case class Config(root: String, output: Option[String], scala: Boolean, verbose:
     case Some(c @ Config(root, None, _, _)) =>
       val path = Paths get root
 
-      pprintln(c.copy(output = Some(path.getParent resolve "text" toString)))
-    case Some(c) => pprintln(c)
+      App(c.copy(output = Some(path.getParent resolve "text" toString)))
+    case Some(c) => App(c)
     case _       =>
   }
