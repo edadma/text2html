@@ -1,16 +1,12 @@
 package io.github.edadma.text2html
 
-import io.github.edadma.char_reader.CharReader
-
+import scala.language.postfixOps
 import java.nio.file.{Files, Paths}
-import pprint.*
-
 import java.io.PrintWriter
-import scala.annotation.tailrec
 
-@main def run(): Unit =
-  val root = Paths.get("test/input").toAbsolutePath
-  val output = Paths.get("test/text").toAbsolutePath
+def App(config: Config): Unit =
+  val root = Paths get "test/input" toAbsolutePath
+  val output = Paths get "test/text" toAbsolutePath
 
   println(s"Root directory $root")
 
