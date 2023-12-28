@@ -16,7 +16,7 @@ case class Config(root: String, output: Option[String], scala: Boolean, verbose:
       programName("text2html"),
       head("text2html", "0.0.1"),
       opt[String]('o', "output")
-        .valueName("<path>")
+        .valueName("<output path>")
         .action((x, c) => c.copy(output = Some(x)))
         .text("output path"),
       opt[Unit]('s', "scala")
@@ -24,7 +24,7 @@ case class Config(root: String, output: Option[String], scala: Boolean, verbose:
         .text("generate Scala code"),
       opt[Unit]('v', "verbose")
         .action((_, c) => c.copy(verbose = true))
-        .text("verbose is a flag"),
+        .text("verbose console output"),
       help("help").text("prints this usage text"),
       arg[String]("<root path>")
         .action((x, c) => c.copy(root = x))
