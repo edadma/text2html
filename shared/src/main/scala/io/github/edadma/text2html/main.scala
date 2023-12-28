@@ -5,7 +5,7 @@ import pprint.*
 import scala.language.postfixOps
 import java.nio.file.Paths
 
-case class Config(root: String, output: Option[String], scala: Boolean, verbose: Boolean)
+case class Config(root: String, output: Option[String], scala: Option[String], verbose: Boolean)
 
 @main def run(args: String*): Unit =
   import scopt.OParser
@@ -19,9 +19,10 @@ case class Config(root: String, output: Option[String], scala: Boolean, verbose:
         .valueName("<output path>")
         .action((x, c) => c.copy(output = Some(x)))
         .text("output path"),
-      opt[Unit]('s', "scala")
-        .action((_, c) => c.copy(scala = true))
-        .text("generate Scala code"),
+      opt[String]('s', "scala")
+        .valueName("<package>")
+        .action((x, c) => c.copy(scala = Some(x)))
+        .text("generate Scala code for <package>"),
       opt[Unit]('v', "verbose")
         .action((_, c) => c.copy(verbose = true))
         .text("verbose console output"),
@@ -39,7 +40,7 @@ case class Config(root: String, output: Option[String], scala: Boolean, verbose:
     )
   }
 
-  OParser.parse(parser, args, Config(null, None, false, false)) match {
+  OParser.parse(parser, args, Config(null, None, None, false)) match {
     case Some(c @ Config(root, None, _, _)) =>
       val path = Paths get root
 
