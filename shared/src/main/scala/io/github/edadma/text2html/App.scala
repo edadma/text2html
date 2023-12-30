@@ -25,7 +25,9 @@ def App(config: Config): Unit =
     message(s"Creating directory $outdir for book '$bookName'")
     Files.createDirectories(outdir)
 
-    list(d).filter(_.getFileName.toString.endsWith(".md")) foreach { f =>
+    val chapters = list(d).filter(_.getFileName.toString.endsWith(".md"))
+
+    chapters foreach { f =>
       message(s"Reading markdown file $f")
 
       if (!Files.isReadable(f)) problem(s"File $f is unreadable")
@@ -53,4 +55,15 @@ def App(config: Config): Unit =
 
       out.close()
     }
+
+    if config.scala.isDefined then
+      Files.writeString(
+        outdir resolve "book.scala",
+        s"""package ${config.scala.get}.$book
+            |
+            |import collection.immutable.ArraySeq
+            |
+            |val $book = ArraySeq(${1 to chapters.length map (c => s"$book$c") mkString ", "})
+            |""".stripMargin,
+      )
   }
