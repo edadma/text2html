@@ -63,7 +63,7 @@ def App(config: Config): Unit =
             |
             |import collection.immutable.ArraySeq
             |
-            |val $book = ArraySeq(${1 to chapters.length map (c => s"$book$c") mkString ", "})
+            |val book = ArraySeq(${1 to chapters.length map (c => s"$book$c") mkString ", "})
             |""".stripMargin,
       )
   }
