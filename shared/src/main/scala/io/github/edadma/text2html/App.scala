@@ -3,6 +3,7 @@ package io.github.edadma.text2html
 import scala.language.postfixOps
 import java.nio.file.{Files, Paths}
 import java.io.PrintWriter
+import pprint.*
 
 def App(config: Config): Unit =
   val root = Paths get config.root toAbsolutePath
@@ -18,8 +19,21 @@ def App(config: Config): Unit =
   list(root).filter(p => isDir(p) && !p.getFileName.toString.startsWith(".")) foreach { d =>
     message(s"Processing directory $d")
 
-    val book = d.getFileName.toString
-    val bookName = book split '_' map (_.capitalize) mkString " "
+    val folder = d.getFileName.toString
+    val bookName = folder split '-' map (_.capitalize) mkString " "
+    val book =
+      if config.scala.isDefined then
+        val segs = folder split '-'
+
+        if segs.length == 1 then folder
+        else
+          segs map {
+            case "1" => "maysa"
+            case "2" => "dua"
+            case "3" => "tallo"
+            case s   => s
+          } mkString "_"
+      else folder
     val outdir = output resolve book
 
     message(s"Creating directory $outdir for book '$bookName'")
@@ -34,7 +48,7 @@ def App(config: Config): Unit =
 
       val chapter = f.getFileName.toString.dropRight(3).toInt.toString
       val in = Files.readString(f)
-      val outfile = outdir resolve (if config.scala.isDefined then s"$book$chapter.scala" else chapter)
+      val outfile = outdir resolve (if config.scala.isDefined then s"${book}_$chapter.scala" else chapter)
       val out = new PrintWriter(outfile.toString)
 
       message(s"Writing to file $outfile")
@@ -42,7 +56,7 @@ def App(config: Config): Unit =
       if config.scala.isDefined then
         out.println(s"package ${config.scala.get}.$book")
         out.println()
-        out.println(s"val $book$chapter =")
+        out.println(s"val ${book}_$chapter =")
         out.print("\"\"\"")
 
       out.println(s"""<div class="prose${config.clas.map(' ' +: _).getOrElse("")}">""")
@@ -61,7 +75,7 @@ def App(config: Config): Unit =
             |
             |import collection.immutable.ArraySeq
             |
-            |val book = ArraySeq(${1 to chapters.length map (c => s"$book$c") mkString ", "})
+            |val book = ArraySeq(${1 to chapters.length map (c => s"${book}_$c") mkString ", "})
             |""".stripMargin,
       )
   }
