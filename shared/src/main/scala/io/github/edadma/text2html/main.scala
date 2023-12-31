@@ -5,7 +5,7 @@ import pprint.*
 import scala.language.postfixOps
 import java.nio.file.Paths
 
-case class Config(root: String, output: Option[String], scala: Option[String], verbose: Boolean)
+case class Config(root: String, output: Option[String], scala: Option[String], clas: Option[String], verbose: Boolean)
 
 @main def run(args: String*): Unit =
   import scopt.OParser
@@ -15,6 +15,10 @@ case class Config(root: String, output: Option[String], scala: Option[String], v
     OParser.sequence(
       programName("text2html"),
       head("text2html", "0.0.1"),
+      opt[String]('c', "class")
+        .valueName("<class>")
+        .action((x, c) => c.copy(clas = Some(x)))
+        .text("use <class> to style chapters"),
       opt[String]('o', "output")
         .valueName("<output path>")
         .action((x, c) => c.copy(output = Some(x)))
@@ -40,8 +44,8 @@ case class Config(root: String, output: Option[String], scala: Option[String], v
     )
   }
 
-  OParser.parse(parser, args, Config(null, None, None, false)) match {
-    case Some(c @ Config(root, None, _, _)) =>
+  OParser.parse(parser, args, Config(null, None, None, None, false)) match {
+    case Some(c @ Config(root, None, _, _, _)) =>
       val path = Paths get root
 
       App(c.copy(output = Some(path.getParent resolve "text" toString)))

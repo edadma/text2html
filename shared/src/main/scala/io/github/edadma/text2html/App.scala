@@ -45,9 +45,7 @@ def App(config: Config): Unit =
         out.println(s"val $book$chapter =")
         out.print("\"\"\"")
 
-      out.println(
-        """<div class="prose prose-h1:text-gray-400 prose-h1:font-fondamento prose-h1:font-normal prose-h2:text-gray-400 prose-h3:text-gray-400 prose-p:text-gray-400 prose-p:m-0">""",
-      )
+      out.println(s"""<div class="prose${config.clas.map(' ' +: _).getOrElse("")}">""")
       out.println(transform(in))
       out.print("</div>")
 
