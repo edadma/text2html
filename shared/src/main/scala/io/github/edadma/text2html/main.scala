@@ -36,9 +36,9 @@ case class Config(root: String, output: Option[String], scala: Option[String], c
         .text("root path"),
       checkConfig(c =>
         if c.output.isEmpty && c.root != null then
-          val path = Paths get c.root
+          val root = Paths get c.root
 
-          if path.getNameCount < 2 then failure("output path needs to be specified") else success
+          if root.getNameCount < 2 || root.isAbsolute then failure("output path needs to be specified") else success
         else success,
       ),
     )
