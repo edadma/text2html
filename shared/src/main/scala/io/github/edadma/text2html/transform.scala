@@ -83,7 +83,7 @@ def transform(md: String): String =
       else if line.head.isDigit then
         val (verse, rest) = line.span(_.isDigit)
 
-        add(s""""<sup id="$verse">$verse</sup>${rest.trim}""")
+        add(s"""<sup id="$verse">$verse</sup>${rest.trim}""")
         transform(r1)
       else
         add(line)
