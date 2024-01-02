@@ -28,9 +28,9 @@ def App(config: Config): Unit =
         if segs.length == 1 then folder
         else
           segs map {
-            case "1" => "maysa"
-            case "2" => "dua"
-            case "3" => "tallo"
+            case "1" => "umuna_a"
+            case "2" => "maikadua_a"
+            case "3" => "maikatlo_a"
             case s   => s
           } mkString "_"
       else folder
