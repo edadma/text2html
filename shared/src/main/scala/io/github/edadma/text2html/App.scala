@@ -40,33 +40,35 @@ def App(config: Config): Unit =
     Files.createDirectories(outdir)
 
     val chapters = list(d).filter(_.getFileName.toString.endsWith(".md"))
+    val chapterList =
+      chapters map { f =>
+        message(s"Reading markdown file $f")
 
-    chapters foreach { f =>
-      message(s"Reading markdown file $f")
+        if (!Files.isReadable(f)) problem(s"File $f is unreadable")
 
-      if (!Files.isReadable(f)) problem(s"File $f is unreadable")
+        val chapter = f.getFileName.toString.dropRight(3).toInt.toString
+        val in = Files.readString(f)
+        val outfile = outdir resolve (if config.scala.isDefined then s"${book}_$chapter.scala" else chapter)
+        val out = new PrintWriter(outfile.toString)
+        val (contents, verses) = transform(in)
 
-      val chapter = f.getFileName.toString.dropRight(3).toInt.toString
-      val in = Files.readString(f)
-      val outfile = outdir resolve (if config.scala.isDefined then s"${book}_$chapter.scala" else chapter)
-      val out = new PrintWriter(outfile.toString)
+        message(s"Writing to file $outfile")
 
-      message(s"Writing to file $outfile")
+        if config.scala.isDefined then
+          out.println(s"package ${config.scala.get}.$book")
+          out.println()
+          out.println(s"val ${book}_$chapter =")
+          out.print("\"\"\"")
 
-      if config.scala.isDefined then
-        out.println(s"package ${config.scala.get}.$book")
-        out.println()
-        out.println(s"val ${book}_$chapter =")
-        out.print("\"\"\"")
+        out.println(s"""<div class="prose${config.clas.map(' ' +: _).getOrElse("")}">""")
+        out.println(contents)
+        out.print("</div>")
 
-      out.println(s"""<div class="prose${config.clas.map(' ' +: _).getOrElse("")}">""")
-      out.println(transform(in))
-      out.print("</div>")
+        if config.scala.isDefined then out.print("\"\"\"")
 
-      if config.scala.isDefined then out.print("\"\"\"")
-
-      out.close()
-    }
+        out.close()
+        verses
+      }
 
     if config.scala.isDefined then
       Files.writeString(
@@ -75,7 +77,7 @@ def App(config: Config): Unit =
             |
             |import collection.immutable.ArraySeq
             |
-            |val book = ArraySeq(${1 to chapters.length map (c => s"${book}_$c") mkString ", "})
+            |val book = ArraySeq(${chapterList.zipWithIndex map ((v, c) => s"(${book}_${c + 1}, $v)") mkString ", "})
             |""".stripMargin,
       )
   }

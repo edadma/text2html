@@ -4,7 +4,7 @@ import io.github.edadma.char_reader.CharReader
 
 import scala.annotation.tailrec
 
-def transform(md: String): String =
+def transform(md: String): (String, Int) =
   @tailrec
   def skipUntilAfter(r: CharReader, c: Char): CharReader =
     if r.eoi then r
@@ -50,13 +50,13 @@ def transform(md: String): String =
       firstParagraph = false
 
   @tailrec
-  def transform(r: CharReader): String =
+  def transform(r: CharReader, verses: Int = 0): (String, Int) =
     if r.eoi then
       paragraph()
-      buf.toString
+      (buf.toString, verses)
     else if r.ch == '\n' then
       paragraph()
-      transform(r.next)
+      transform(r.next, verses)
     else if r.ch == '#' then
       val (count, r1) = skipRepeating(r, '#')
       val r2 = skipSpace(r1)
@@ -65,7 +65,7 @@ def transform(md: String): String =
       paragraph()
       firstParagraph = true
       tag(s"h$count", heading)
-      transform(r3)
+      transform(r3, verses)
     else
       val (line, r1) = consumeLine(r)
       val (next, r2) = consumeLine(r1)
@@ -74,20 +74,20 @@ def transform(md: String): String =
         paragraph()
         firstParagraph = true
         tag("h1", line)
-        transform(r2)
+        transform(r2, verses)
       else if next.nonEmpty && next.forall(_ == '-') then
         paragraph()
         firstParagraph = true
         tag("h2", line)
-        transform(r2)
+        transform(r2, verses)
       else if line.head.isDigit then
         val (verse, rest) = line.span(_.isDigit)
 
         add(s"""<sup id="$verse">$verse</sup>${rest.trim}""")
-        transform(r1)
+        transform(r1, verses + 1)
       else
         add(line)
-        transform(r1)
+        transform(r1, verses)
   end transform
 
   transform(CharReader.fromString(md))
