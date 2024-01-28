@@ -85,7 +85,10 @@ def transform(md: String): (String, Int) =
       else if line.head.isDigit then
         val (verse, rest) = line.span(_.isDigit)
 
-        add(s"""<sup class="mr-px" id="$verse">$verse</sup>${rest.dropWhile(_ == '.').trim}""")
+        add(s"""<sup class="mr-px" id="$verse">$verse</sup>${footnoteRegex
+            .replaceAllIn(rest, "")
+            .dropWhile(_ == '.')
+            .trim}""")
         transform(r1, verses + 1)
       else if line contains "footnote" then
         paragraph()
