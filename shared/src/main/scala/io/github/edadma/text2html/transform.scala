@@ -49,6 +49,8 @@ def transform(md: String): (String, Int) =
       par.clear()
       firstParagraph = false
 
+  val footnoteRegex = raw"\[[a-z]+]".r
+
   @tailrec
   def transform(r: CharReader, verses: Int = 0): (String, Int) =
     if r.eoi then
@@ -85,8 +87,11 @@ def transform(md: String): (String, Int) =
 
         add(s"""<sup class="mr-px" id="$verse">$verse</sup>${rest.dropWhile(_ == '.').trim}""")
         transform(r1, verses + 1)
+      else if line contains "footnote" then
+        paragraph()
+        (buf.toString, verses)
       else
-        add(line)
+        add(footnoteRegex.replaceAllIn(line, ""))
         transform(r1, verses)
   end transform
 
